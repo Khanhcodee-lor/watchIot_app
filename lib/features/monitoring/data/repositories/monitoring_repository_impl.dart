@@ -23,15 +23,4 @@ class MonitoringRepositoryImpl implements MonitoringRepository {
 
   @override
   Stream<bool> watchConnection() => _dataSource.watchConnection();
-
-  @override
-  Future<void> requestCancelAlert({
-    required String deviceUid,
-    required String requestedBy,
-  }) {
-    return _dataSource.requestCancelAlert(
-      deviceUid: deviceUid,
-      requestedBy: requestedBy,
-    );
-  }
 }

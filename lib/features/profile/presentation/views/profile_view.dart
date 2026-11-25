@@ -9,12 +9,14 @@ class ProfileView extends StatelessWidget {
     required this.accountUid,
     required this.deviceUid,
     required this.onSignOut,
+    required this.onOpenSettings,
   });
 
   final String email;
   final String accountUid;
   final String deviceUid;
   final VoidCallback onSignOut;
+  final VoidCallback onOpenSettings;
 
   @override
   Widget build(BuildContext context) {
@@ -98,6 +100,20 @@ class ProfileView extends StatelessWidget {
             color: AppColors.warning,
           ),
           const SizedBox(height: 20),
+          FilledButton.icon(
+            onPressed: onOpenSettings,
+            icon: const Icon(Icons.health_and_safety_rounded),
+            label: const Text('Cài đặt Firebase và người thân'),
+            style: FilledButton.styleFrom(
+              minimumSize: const Size.fromHeight(52),
+              backgroundColor: AppColors.accentSoft,
+              foregroundColor: AppColors.warning,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(17),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
           OutlinedButton.icon(
             onPressed: onSignOut,
             icon: const Icon(Icons.logout_rounded),

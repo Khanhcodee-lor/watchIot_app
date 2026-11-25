@@ -25,6 +25,7 @@ class AudioAlarmController implements AlarmController {
     } catch (_) {
       _active = false;
       _hapticTimer?.cancel();
+      await _player.stop();
       rethrow;
     }
   }

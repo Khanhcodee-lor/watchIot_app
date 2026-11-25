@@ -5,8 +5,4 @@ abstract interface class MonitoringRepository {
   Stream<WatchSnapshot> watchLatest(String deviceUid);
   Stream<List<WatchEvent>> watchEvents(String deviceUid);
   Stream<bool> watchConnection();
-  Future<void> requestCancelAlert({
-    required String deviceUid,
-    required String requestedBy,
-  });
 }

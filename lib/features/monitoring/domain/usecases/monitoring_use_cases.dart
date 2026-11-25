@@ -27,16 +27,3 @@ class WatchConnectionUseCase {
 
   Stream<bool> call() => _repository.watchConnection();
 }
-
-class RequestCancelAlertUseCase {
-  const RequestCancelAlertUseCase(this._repository);
-
-  final MonitoringRepository _repository;
-
-  Future<void> call({required String deviceUid, required String requestedBy}) {
-    return _repository.requestCancelAlert(
-      deviceUid: deviceUid,
-      requestedBy: requestedBy,
-    );
-  }
-}
