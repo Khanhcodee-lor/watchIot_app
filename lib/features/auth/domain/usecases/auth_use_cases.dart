@@ -27,6 +27,16 @@ class SignInUseCase {
   }
 }
 
+class RegisterUseCase {
+  const RegisterUseCase(this._repository);
+
+  final AuthRepository _repository;
+
+  Future<void> call({required String email, required String password}) {
+    return _repository.register(email: email, password: password);
+  }
+}
+
 class SendPasswordResetUseCase {
   const SendPasswordResetUseCase(this._repository);
 

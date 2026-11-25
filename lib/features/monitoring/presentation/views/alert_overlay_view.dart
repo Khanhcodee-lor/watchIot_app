@@ -93,18 +93,22 @@ class _AlertOverlayViewState extends State<AlertOverlayView>
   Widget build(BuildContext context) {
     final isEmergency = widget.emergency;
     final color = isEmergency
-        ? const Color(0xFFFF2538)
-        : const Color(0xFFFF5D68);
+        ? const Color(0xFFFF8792)
+        : const Color(0xFFFFA0A4);
+    final baseColor = isEmergency
+        ? const Color(0xFF5D1220)
+        : const Color(0xFF741B2A);
     return Material(
-      color: AppColors.background,
+      color: baseColor,
       child: AnimatedBuilder(
         animation: _pulseController,
         builder: (context, child) {
-          final opacity = isEmergency
-              ? 0.22 + _pulseController.value * 0.25
-              : 0.08 + _pulseController.value * 0.26;
           return Container(
-            color: Color.lerp(AppColors.background, color, opacity),
+            color: Color.lerp(
+              baseColor,
+              const Color(0xFFB3263E),
+              _pulseController.value * (isEmergency ? 0.48 : 0.34),
+            ),
             child: Container(
               decoration: BoxDecoration(
                 gradient: RadialGradient(
@@ -159,7 +163,7 @@ class _AlertOverlayViewState extends State<AlertOverlayView>
                                 : 'Đang chờ người đeo xác nhận an toàn.',
                             textAlign: TextAlign.center,
                             style: const TextStyle(
-                              color: AppColors.muted,
+                              color: Colors.white70,
                               height: 1.5,
                             ),
                           ),
@@ -281,8 +285,8 @@ class _AlertOverlayViewState extends State<AlertOverlayView>
                                     : const Icon(Icons.verified_user_rounded),
                                 label: const Text('HỦY BÁO ĐỘNG GIẢ'),
                                 style: FilledButton.styleFrom(
-                                  backgroundColor: AppColors.accent,
-                                  foregroundColor: AppColors.background,
+                                  backgroundColor: AppColors.accentSoft,
+                                  foregroundColor: AppColors.text,
                                   minimumSize: const Size.fromHeight(56),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(17),
@@ -295,7 +299,7 @@ class _AlertOverlayViewState extends State<AlertOverlayView>
                               'Đồng hồ cần nhận lệnh tại devices/{uid}/commands/cancel_alert để xác nhận hủy.',
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                color: AppColors.muted,
+                                color: Colors.white70,
                                 fontSize: 11,
                                 height: 1.4,
                               ),

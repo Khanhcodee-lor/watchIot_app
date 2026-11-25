@@ -19,18 +19,43 @@ class HistoryView extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 22, 20, 30),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                Text(
-                  'Lịch sử sự kiện',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.headlineMedium?.copyWith(fontSize: 27),
+                Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: AppColors.accentSoft,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppColors.outline),
+                      ),
+                      child: const Icon(
+                        Icons.event_note_rounded,
+                        color: AppColors.warning,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 13),
+                    Expanded(
+                      child: Text(
+                        'Lịch sử sự kiện',
+                        style: Theme.of(
+                          context,
+                        ).textTheme.headlineMedium?.copyWith(fontSize: 24),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 7),
+                const SizedBox(height: 10),
                 const Text(
                   'Các lần phát hiện té ngã và xác nhận an toàn từ đồng hồ.',
                   style: TextStyle(color: AppColors.muted),
                 ),
                 const SizedBox(height: 20),
+                if (watch.errorMessage != null) ...[
+                  _HistoryErrorCard(message: watch.errorMessage!),
+                  const SizedBox(height: 12),
+                ],
                 if (watch.events.isEmpty)
                   _EmptyHistory(isLoading: watch.isLoading)
                 else
@@ -71,7 +96,14 @@ class _EmptyHistory extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+        border: Border.all(color: AppColors.outline),
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.shadow,
+            blurRadius: 20,
+            offset: Offset(0, 7),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -79,8 +111,8 @@ class _EmptyHistory extends StatelessWidget {
             isLoading
                 ? Icons.hourglass_empty_rounded
                 : Icons.event_note_rounded,
-            color: AppColors.muted,
-            size: 38,
+            color: AppColors.warning,
+            size: 32,
           ),
           const SizedBox(height: 12),
           Text(
@@ -91,6 +123,40 @@ class _EmptyHistory extends StatelessWidget {
           const Text(
             'Sự kiện mới sẽ xuất hiện tại đây.',
             style: TextStyle(color: AppColors.muted, fontSize: 12),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HistoryErrorCard extends StatelessWidget {
+  const _HistoryErrorCard({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.danger.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(17),
+        border: Border.all(color: AppColors.danger.withValues(alpha: 0.22)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.cloud_off_rounded, color: AppColors.danger),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                color: AppColors.danger,
+                fontSize: 12,
+                height: 1.4,
+              ),
+            ),
           ),
         ],
       ),
@@ -110,7 +176,7 @@ class _EventCard extends StatelessWidget {
     final color = confirmed
         ? AppColors.danger
         : cancelled
-        ? AppColors.accent
+        ? AppColors.success
         : AppColors.warning;
     final icon = confirmed
         ? Icons.emergency_rounded

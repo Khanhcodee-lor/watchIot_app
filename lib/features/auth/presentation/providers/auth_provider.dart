@@ -10,6 +10,7 @@ class AuthProvider extends ChangeNotifier {
     required this.getCurrentUserUseCase,
     required this.watchAuthStateUseCase,
     required this.signInUseCase,
+    required this.registerUseCase,
     required this.sendPasswordResetUseCase,
     required this.signOutUseCase,
   }) {
@@ -24,6 +25,7 @@ class AuthProvider extends ChangeNotifier {
   final GetCurrentUserUseCase getCurrentUserUseCase;
   final WatchAuthStateUseCase watchAuthStateUseCase;
   final SignInUseCase signInUseCase;
+  final RegisterUseCase registerUseCase;
   final SendPasswordResetUseCase sendPasswordResetUseCase;
   final SignOutUseCase signOutUseCase;
   StreamSubscription<AppUser?>? _subscription;
@@ -70,6 +72,23 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> register(String email, String password) async {
+    _setBusy(true);
+    try {
+      await registerUseCase(email: email, password: password);
+      _errorMessage = null;
+      return true;
+    } on AuthFailure catch (error) {
+      _errorMessage = _friendlyAuthError(error.reason);
+      return false;
+    } catch (_) {
+      _errorMessage = 'Không thể tạo tài khoản. Vui lòng thử lại.';
+      return false;
+    } finally {
+      _setBusy(false);
+    }
+  }
+
   Future<void> signOut() => signOutUseCase();
 
   void clearError() {
@@ -88,6 +107,12 @@ class AuthProvider extends ChangeNotifier {
         return 'Địa chỉ email không hợp lệ.';
       case AuthFailureReason.invalidCredentials:
         return 'Email hoặc mật khẩu chưa chính xác.';
+      case AuthFailureReason.emailAlreadyInUse:
+        return 'Email này đã được đăng ký.';
+      case AuthFailureReason.weakPassword:
+        return 'Mật khẩu quá yếu. Hãy dùng ít nhất 6 ký tự.';
+      case AuthFailureReason.operationNotAllowed:
+        return 'Firebase chưa bật đăng nhập bằng Email/Password.';
       case AuthFailureReason.userDisabled:
         return 'Tài khoản này đã bị vô hiệu hóa.';
       case AuthFailureReason.tooManyRequests:

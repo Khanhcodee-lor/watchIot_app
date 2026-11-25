@@ -18,6 +18,7 @@ dependencies:
   url_launcher: ^6.3.0
   audioplayers: ^6.0.0
   intl: ^0.19.0
+  shared_preferences: ^2.5.6
 
 dev_dependencies:
   flutter_test:
@@ -26,3 +27,11 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/login_watch_hero.png
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Variable.ttf
+  licenses:
+    - assets/fonts/OFL.txt

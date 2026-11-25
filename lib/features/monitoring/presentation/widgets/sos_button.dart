@@ -30,7 +30,7 @@ class SosButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final background = secondary ? AppColors.surfaceRaised : AppColors.danger;
-    final foreground = Colors.white;
+    final foreground = secondary ? AppColors.text : Colors.white;
     return SizedBox(
       width: double.infinity,
       child: FilledButton.icon(

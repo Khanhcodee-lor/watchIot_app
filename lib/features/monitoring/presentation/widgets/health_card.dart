@@ -26,14 +26,21 @@ class HealthCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final highlight = warning ? AppColors.warning : color;
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: highlight.withValues(alpha: warning ? 0.42 : 0.12),
           width: warning ? 1.2 : 1,
         ),
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.shadow,
+            blurRadius: 20,
+            offset: Offset(0, 7),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,11 +48,11 @@ class HealthCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 40,
-                height: 40,
+                width: 36,
+                height: 36,
                 decoration: BoxDecoration(
                   color: highlight.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, size: 21, color: highlight),
               ),
@@ -58,10 +65,10 @@ class HealthCard extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 12),
           Text(
             title,
-            style: const TextStyle(color: AppColors.muted, fontSize: 13),
+            style: const TextStyle(color: AppColors.muted, fontSize: 12),
           ),
           const SizedBox(height: 6),
           Row(
@@ -74,8 +81,8 @@ class HealthCard extends StatelessWidget {
                   child: Text(
                     value,
                     style: TextStyle(
-                      color: warning ? AppColors.warning : Colors.white,
-                      fontSize: 32,
+                      color: warning ? AppColors.warning : AppColors.text,
+                      fontSize: 29,
                       fontWeight: FontWeight.w800,
                       height: 1,
                     ),
@@ -98,14 +105,14 @@ class HealthCard extends StatelessWidget {
             ],
           ),
           if (caption != null) ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: 7),
             Text(
               caption!,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: warning ? AppColors.warning : AppColors.muted,
-                fontSize: 12,
+                fontSize: 10,
               ),
             ),
           ],

@@ -12,12 +12,16 @@ class RealtimeWatchMapper {
     final healthMap = _asMap(root['health']);
     final sensorMap = _asMap(root['sensor']);
     final alertMap = _asMap(root['alert']);
+    // The current ESP32 firmware publishes the AI result under `inference`.
+    // Keep supporting `alert` for firmware versions that use that name.
+    final inferenceMap = _asMap(root['inference']);
+    final resolvedAlertMap = alertMap.isNotEmpty ? alertMap : inferenceMap;
 
     return WatchSnapshot(
       health: healthMap.isEmpty ? null : _toHealth(healthMap),
       sensor: sensorMap.isEmpty ? null : _toSensor(sensorMap),
-      alert: alertMap.isEmpty ? null : _toAlert(alertMap),
-      updatedAt: _latestTimestamp(root, healthMap, sensorMap),
+      alert: resolvedAlertMap.isEmpty ? null : _toAlert(resolvedAlertMap),
+      updatedAt: _latestTimestamp(root, healthMap, sensorMap, resolvedAlertMap),
     );
   }
 
@@ -116,6 +120,7 @@ class RealtimeWatchMapper {
     Map<Object?, Object?> root,
     Map<Object?, Object?> health,
     Map<Object?, Object?> sensor,
+    Map<Object?, Object?> alert,
   ) {
     final candidates = [
       _readTimestamp(root, const ['updated_at', 'timestamp', 'last_seen']),
@@ -126,6 +131,12 @@ class RealtimeWatchMapper {
         'last_seen',
       ]),
       _readTimestamp(sensor, const [
+        'updated_at',
+        'timestamp',
+        'timestamp_ms',
+        'last_seen',
+      ]),
+      _readTimestamp(alert, const [
         'updated_at',
         'timestamp',
         'timestamp_ms',

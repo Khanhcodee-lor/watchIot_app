@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:watchiot/features/monitoring/domain/entities/fall_alert.dart';
 import 'package:watchiot/features/monitoring/domain/entities/health_reading.dart';
@@ -50,7 +51,10 @@ class WatchDataProvider extends ChangeNotifier {
   bool isLoading = true;
   bool isSendingCancel = false;
   bool isAlertLocallyDismissed = false;
-  String? errorMessage;
+  String? _connectionErrorMessage;
+  String? _latestErrorMessage;
+  String? _eventsErrorMessage;
+  String? _commandErrorMessage;
   DateTime _now = DateTime.now();
   String? _lastAlertStatus;
   String? _lastHealthSignature;
@@ -58,6 +62,11 @@ class WatchDataProvider extends ChangeNotifier {
 
   List<MetricPoint> get heartRatePoints => List.unmodifiable(_heartRatePoints);
   List<MetricPoint> get spo2Points => List.unmodifiable(_spo2Points);
+  String? get errorMessage =>
+      _latestErrorMessage ??
+      _eventsErrorMessage ??
+      _connectionErrorMessage ??
+      _commandErrorMessage;
 
   DateTime? get alertStartedAt => alert?.startedAt ?? _localAlertStartedAt;
 
@@ -94,12 +103,13 @@ class WatchDataProvider extends ChangeNotifier {
     _connectionSubscription = watchConnectionUseCase().listen(
       (connected) {
         firebaseConnected = connected;
-        errorMessage = null;
+        if (connected) _connectionErrorMessage = null;
         notifyListeners();
       },
       onError: (Object error) {
         firebaseConnected = false;
-        errorMessage = 'Không thể kết nối Firebase Realtime Database.';
+        _connectionErrorMessage =
+            'Không thể kết nối Firebase Realtime Database.';
         notifyListeners();
       },
     );
@@ -108,8 +118,10 @@ class WatchDataProvider extends ChangeNotifier {
       _handleLatest,
       onError: (Object error) {
         isLoading = false;
-        errorMessage =
-            'Không đọc được dữ liệu đồng hồ. Hãy kiểm tra quyền Firebase.';
+        _latestErrorMessage = _readErrorMessage(
+          error,
+          '/devices/$deviceUid/latest',
+        );
         notifyListeners();
       },
     );
@@ -117,10 +129,14 @@ class WatchDataProvider extends ChangeNotifier {
     _eventsSubscription = watchEventsUseCase(deviceUid).listen(
       (nextEvents) {
         events = nextEvents;
+        _eventsErrorMessage = null;
         notifyListeners();
       },
       onError: (Object error) {
-        errorMessage = 'Không đọc được lịch sử sự kiện.';
+        _eventsErrorMessage = _readErrorMessage(
+          error,
+          '/devices/$deviceUid/events',
+        );
         notifyListeners();
       },
     );
@@ -184,7 +200,7 @@ class WatchDataProvider extends ChangeNotifier {
         ? null
         : snapshot.updatedAt ?? receivedAt;
     isLoading = false;
-    errorMessage = null;
+    _latestErrorMessage = null;
     _now = DateTime.now();
     notifyListeners();
   }
@@ -199,10 +215,10 @@ class WatchDataProvider extends ChangeNotifier {
       );
       isAlertLocallyDismissed = true;
       unawaited(alarmController.stop().catchError((Object _) {}));
-      errorMessage = null;
+      _commandErrorMessage = null;
       return true;
     } catch (_) {
-      errorMessage =
+      _commandErrorMessage =
           'Không gửi được yêu cầu hủy. Kiểm tra quyền ghi vào commands.';
       return false;
     } finally {
@@ -215,6 +231,26 @@ class WatchDataProvider extends ChangeNotifier {
     if (value <= 0) return;
     points.add(MetricPoint(at, value));
     if (points.length > 20) points.removeAt(0);
+  }
+
+  String _readErrorMessage(Object error, String path) {
+    final firebaseError = error is FirebaseException ? error : null;
+    final details = [
+      error.toString(),
+      firebaseError?.code ?? '',
+      firebaseError?.message ?? '',
+    ].join(' ').toLowerCase();
+    if (details.contains('permission_denied') ||
+        details.contains('permission-denied') ||
+        details.contains('permission denied') ||
+        details.contains('insufficient permission')) {
+      return 'Tài khoản app chưa được RTDB Rules cấp quyền đọc $path.';
+    }
+    if (firebaseError != null) {
+      final message = firebaseError.message;
+      return 'Lỗi Firebase (${firebaseError.code}) khi đọc $path${message == null || message.isEmpty ? '.' : ': $message'}';
+    }
+    return 'Không đọc được $path. Hãy kiểm tra kết nối Firebase và UID thiết bị.';
   }
 
   @override

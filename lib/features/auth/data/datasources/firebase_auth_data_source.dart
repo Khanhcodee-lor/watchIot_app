@@ -20,6 +20,20 @@ class FirebaseAuthDataSource {
     }
   }
 
+  Future<void> register({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      await _auth.createUserWithEmailAndPassword(
+        email: email.trim(),
+        password: password,
+      );
+    } on FirebaseAuthException catch (error) {
+      throw AuthFailure(_mapFailureReason(error.code));
+    }
+  }
+
   Future<void> sendPasswordReset(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email.trim());
@@ -38,6 +52,12 @@ class FirebaseAuthDataSource {
       case 'wrong-password':
       case 'invalid-credential':
         return AuthFailureReason.invalidCredentials;
+      case 'email-already-in-use':
+        return AuthFailureReason.emailAlreadyInUse;
+      case 'weak-password':
+        return AuthFailureReason.weakPassword;
+      case 'operation-not-allowed':
+        return AuthFailureReason.operationNotAllowed;
       case 'user-disabled':
         return AuthFailureReason.userDisabled;
       case 'too-many-requests':

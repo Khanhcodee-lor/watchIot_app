@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watchiot/app/auth_gate.dart';
 import 'package:watchiot/core/app_theme.dart';
 import 'package:watchiot/features/auth/data/datasources/firebase_auth_data_source.dart';
@@ -11,10 +12,13 @@ import 'package:watchiot/features/auth/domain/repositories/auth_repository.dart'
 import 'package:watchiot/features/auth/domain/usecases/auth_use_cases.dart';
 import 'package:watchiot/features/auth/presentation/providers/auth_provider.dart';
 import 'package:watchiot/features/monitoring/data/datasources/realtime_database_data_source.dart';
+import 'package:watchiot/features/monitoring/data/datasources/device_uid_local_data_source.dart';
 import 'package:watchiot/features/monitoring/data/repositories/monitoring_repository_impl.dart';
+import 'package:watchiot/features/monitoring/data/repositories/device_uid_settings_repository_impl.dart';
 import 'package:watchiot/features/monitoring/data/services/audio_alarm_controller.dart';
 import 'package:watchiot/features/monitoring/domain/repositories/alarm_controller.dart';
 import 'package:watchiot/features/monitoring/domain/repositories/monitoring_repository.dart';
+import 'package:watchiot/features/monitoring/domain/repositories/device_uid_settings_repository.dart';
 import 'package:watchiot/features/monitoring/domain/usecases/monitoring_use_cases.dart';
 
 const firebaseDatabaseUrl =
@@ -40,6 +44,11 @@ Future<void> main() async {
       providers: [
         Provider<AuthRepository>.value(value: authRepository),
         Provider<MonitoringRepository>.value(value: monitoringRepository),
+        Provider<DeviceUidSettingsRepository>(
+          create: (_) => DeviceUidSettingsRepositoryImpl(
+            DeviceUidLocalDataSource(SharedPreferencesAsync()),
+          ),
+        ),
         Provider<GetCurrentUserUseCase>(
           create: (context) =>
               GetCurrentUserUseCase(context.read<AuthRepository>()),
@@ -50,6 +59,9 @@ Future<void> main() async {
         ),
         Provider<SignInUseCase>(
           create: (context) => SignInUseCase(context.read<AuthRepository>()),
+        ),
+        Provider<RegisterUseCase>(
+          create: (context) => RegisterUseCase(context.read<AuthRepository>()),
         ),
         Provider<SendPasswordResetUseCase>(
           create: (context) =>
@@ -63,6 +75,7 @@ Future<void> main() async {
             getCurrentUserUseCase: context.read<GetCurrentUserUseCase>(),
             watchAuthStateUseCase: context.read<WatchAuthStateUseCase>(),
             signInUseCase: context.read<SignInUseCase>(),
+            registerUseCase: context.read<RegisterUseCase>(),
             sendPasswordResetUseCase: context.read<SendPasswordResetUseCase>(),
             signOutUseCase: context.read<SignOutUseCase>(),
           ),
