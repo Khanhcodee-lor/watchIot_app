@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "914177040331",
+    "firebase_url": "https://smartwatch-c1877-default-rtdb.firebaseio.com",
+    "project_id": "smartwatch-c1877",
+    "storage_bucket": "smartwatch-c1877.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:914177040331:android:9dfd9dbcce5dd6092ba04e",
+        "android_client_info": {
+          "package_name": "com.iot.smartwatch"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "914177040331-u7hr639k42b3oro3g7fo0ogc0qsag2q6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzIfSgW4q4pFCpheZqJhlL-LeeiBZcVN8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "914177040331-u7hr639k42b3oro3g7fo0ogc0qsag2q6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
